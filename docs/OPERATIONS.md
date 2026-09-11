@@ -46,3 +46,9 @@ Experiment prompts, expected answers, configs, measured samples and provenance a
 API requests can be traced using OpenTelemetry. Prometheus metrics from the API describe that process's inference traffic and the shared job queue. Distributed worker experiment results are read from SQL; they are not automatically merged into API latency histograms.
 
 Remote hosting requires TLS, protected database access, secret management and backups. The supplied Compose credentials are explicitly local-development values. The optional Kubernetes autoscaler requires working metrics and holds replica count when metrics are missing. Only one autoscaling controller should own a deployment.
+
+## Container security gate
+
+The runtime uses Debian trixie explicitly, applies available package updates, and retains the blocking HIGH/CRITICAL Trivy scan. The image supports Python Ray tasks; optional Ray Java JARs are removed because InferScale never invokes Java tasks and the bundled Java HTTP library had CVE-2026-54399. CI executes an actual Python Ray task in the built image to verify that boundary. Cross-language Java Ray jobs are not supported by this image.
+
+CI retains the complete JSON scan report even when scanning fails. An unfixed distribution vulnerability remains a failing finding; this project does not automatically suppress it. A passing functional test job is not a security qualification.

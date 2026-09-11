@@ -5,11 +5,16 @@ RUN npm ci
 COPY frontend/ ./
 RUN npm run build
 
-FROM python:3.12-slim
+FROM python:3.12-slim-trixie
+# Apply available Debian security updates on every fresh image build.
+RUN apt-get update && apt-get upgrade -y --no-install-recommends && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY pyproject.toml requirements.lock ./
 COPY src ./src
 RUN pip install --no-cache-dir -r requirements.lock && pip install --no-cache-dir --no-deps . && useradd --uid 10001 --create-home runner
+# InferScale executes Python Ray tasks only; do not ship Ray's optional Java runtime.
+# Removing the actual JAR also removes its vulnerable bundled HttpComponents code.
+RUN python -c "import pathlib, ray; jars = pathlib.Path(ray.__file__).parent / 'jars'; [p.unlink() for p in jars.glob('*.jar')]"
 COPY configs ./configs
 COPY --from=dashboard /frontend/dist ./frontend/dist
 RUN mkdir /data && chown runner:runner /data

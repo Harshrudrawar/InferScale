@@ -32,6 +32,7 @@ def main():
         result = asyncio.run(execute_remote(document, Sink()))
         assert result["status"] == "completed"
         assert result["summary"]["successful_requests"] == 4
+        Path("reports").mkdir(exist_ok=True)
         Path("reports/ray-smoke.json").write_text(
             json.dumps(
                 {

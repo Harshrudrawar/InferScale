@@ -25,8 +25,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: docker build -t inferscale:ci .
-      - run: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:0.60.0 image --exit-code 1 --severity HIGH,CRITICAL inferscale:ci
+      - run: docker build --pull -t inferscale:ci .
+      - name: Verify Python Ray execution in the runtime image
+        run: >-
+          docker run --rm --shm-size=512m
+          --tmpfs /work:uid=10001,gid=10001,mode=1777
+          -v "$PWD/scripts:/checks:ro" -w /work
+          inferscale:ci python /checks/ray_smoke.py
+      - name: Scan runtime image
+        if: always()
+        run: >-
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock
+          -v "$PWD:/reports" aquasec/trivy:0.60.0 image
+          --exit-code 1 --severity HIGH,CRITICAL --format json
+          --output /reports/trivy-results.json inferscale:ci
+      - name: Preserve security findings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: container-security-findings
+          path: trivy-results.json
+          if-no-files-found: warn
 
   postgres:
     runs-on: ubuntu-latest
