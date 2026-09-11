@@ -26,7 +26,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: docker build --pull -t inferscale:ci .
+      - name: Verify application in the runtime image
+        timeout-minutes: 3
+        run: >-
+          docker run --rm --tmpfs /app/reports:uid=10001,gid=10001,mode=1777
+          -v "$PWD/scripts:/app/scripts:ro"
+          inferscale:ci python /app/scripts/smoke.py
       - name: Verify Python Ray execution in the runtime image
+        timeout-minutes: 3
         run: >-
           docker run --rm --shm-size=512m
           --tmpfs /work:uid=10001,gid=10001,mode=1777
@@ -39,6 +46,9 @@ jobs:
           -v "$PWD:/reports" aquasec/trivy:0.60.0 image
           --exit-code 1 --severity HIGH,CRITICAL --format json
           --output /reports/trivy-results.json inferscale:ci
+      - name: Summarize security findings
+        if: always()
+        run: python3 scripts/security_summary.py trivy-results.json
       - name: Preserve security findings
         if: always()
         uses: actions/upload-artifact@v4

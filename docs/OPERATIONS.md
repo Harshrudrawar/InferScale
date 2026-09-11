@@ -49,6 +49,8 @@ Remote hosting requires TLS, protected database access, secret management and ba
 
 ## Container security gate
 
-The runtime uses Debian trixie explicitly, applies available package updates, and retains the blocking HIGH/CRITICAL Trivy scan. The image supports Python Ray tasks; optional Ray Java JARs are removed because InferScale never invokes Java tasks and the bundled Java HTTP library had CVE-2026-54399. CI executes an actual Python Ray task in the built image to verify that boundary. Cross-language Java Ray jobs are not supported by this image.
+The runtime uses the glibc-based Wolfi image with Python 3.12 and its OS package inventory, and retains the blocking HIGH/CRITICAL Trivy scan. The image supports Python Ray tasks; optional Ray Java JARs are removed because InferScale never invokes Java tasks and the bundled Java HTTP library had CVE-2026-54399. CI executes an actual Python Ray task in the built image to verify that boundary. Cross-language Java Ray jobs are not supported by this image.
 
 CI retains the complete JSON scan report even when scanning fails. An unfixed distribution vulnerability remains a failing finding; this project does not automatically suppress it. A passing functional test job is not a security qualification.
+
+The Wolfi image is tested with the live HTTP/SQLite smoke and Python Ray execution before security qualification. The base tag and package index are refreshed on each CI build to pick up fixes; record the resulting image digest when deploying. Debian-based host setup instructions still apply to external engine hosts, not the container package manager.
