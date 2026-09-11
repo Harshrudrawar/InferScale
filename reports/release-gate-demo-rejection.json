@@ -1,0 +1,16 @@
+{
+  "passed": false,
+  "reasons": [
+    "Synthetic results cannot qualify a real deployment",
+    "Insufficient request sample"
+  ],
+  "policy": {
+    "min_quality": 0.9,
+    "max_error_rate": 0.01,
+    "max_p95_seconds": null,
+    "max_latency_regression": 0.1,
+    "max_quality_drop": 0.01,
+    "min_requests": 1000,
+    "allow_synthetic": false
+  }
+}

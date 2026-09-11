@@ -1,0 +1,100 @@
+---
+# Source: inferscale/templates/config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: inferscale-registry
+data:
+  models.json: "[{\"id\":\"synthetic\",\"engine\":\"synthetic\",\"model_name\":\"fixture\",\"resource_group\":\"default\"}]\n"
+---
+# Source: inferscale/templates/api.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: inferscale-api
+spec:
+  selector: {app: "inferscale-api"}
+  ports: [{port: 8000, targetPort: http, name: http}]
+---
+# Source: inferscale/templates/api.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inferscale-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: "inferscale-api"}
+  template:
+    metadata:
+      labels: {app: "inferscale-api"}
+    spec:
+      automountServiceAccountToken: false
+      securityContext: {runAsNonRoot: true, runAsUser: 10001, fsGroup: 10001}
+      containers:
+        - name: api
+          image: "inferscale:0.3.0"
+          imagePullPolicy: IfNotPresent
+          ports: [{containerPort: 8000, name: http}]
+          envFrom: [{secretRef: {name: inferscale-secrets}}]
+          env:
+            - {name: INFERSCALE_EMBEDDED_WORKER, value: '0'}
+            - {name: INFERSCALE_MODELS, value: /config/models.json}
+          resources: {"limits":{"cpu":"2","memory":"2Gi"},"requests":{"cpu":"250m","memory":"512Mi"}}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL]}
+          volumeMounts: [{name: registry, mountPath: /config, readOnly: true}]
+          readinessProbe: {httpGet: {path: /health, port: http}, initialDelaySeconds: 5}
+          livenessProbe: {httpGet: {path: /health, port: http}, initialDelaySeconds: 20}
+      volumes:
+        - name: registry
+          configMap: {name: "inferscale-registry"}
+---
+# Source: inferscale/templates/workers.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inferscale-workers
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app: "inferscale-worker"}
+  template:
+    metadata:
+      labels: {app: "inferscale-worker"}
+    spec:
+      automountServiceAccountToken: false
+      securityContext: {runAsNonRoot: true, runAsUser: 10001, fsGroup: 10001}
+      terminationGracePeriodSeconds: 45
+      containers:
+        - name: worker
+          image: "inferscale:0.3.0"
+          command: [inferscale, worker, --executor, "local"]
+          envFrom: [{secretRef: {name: inferscale-secrets}}]
+          resources: {"limits":{"cpu":"2","memory":"2Gi"},"requests":{"cpu":"250m","memory":"512Mi"}}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL]}
+---
+# Source: inferscale/templates/migration.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: inferscale-migrate
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: '-5'
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: OnFailure
+      automountServiceAccountToken: false
+      securityContext: {runAsNonRoot: true, runAsUser: 10001}
+      containers:
+        - name: migrate
+          image: "inferscale:0.3.0"
+          command: [inferscale, migrate]
+          envFrom: [{secretRef: {name: inferscale-secrets}}]

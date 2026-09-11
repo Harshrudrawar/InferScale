@@ -1,0 +1,27 @@
+[
+  {
+    "id": "qwen-vllm",
+    "engine": "vllm",
+    "model_name": "Qwen/Qwen2.5-0.5B-Instruct",
+    "base_url": "http://127.0.0.1:8001/v1",
+    "revision": "unrecorded",
+    "engine_version": "unrecorded",
+    "hardware": "unrecorded",
+    "gpu_count": 1,
+    "quantization": "BF16",
+    "max_inflight": 32,
+    "deployment_settings": {"max_model_len": 4096}
+  },
+  {
+    "id": "qwen-sglang",
+    "engine": "sglang",
+    "model_name": "Qwen/Qwen2.5-0.5B-Instruct",
+    "base_url": "http://127.0.0.1:30000/v1",
+    "revision": "unrecorded",
+    "engine_version": "unrecorded",
+    "hardware": "unrecorded",
+    "gpu_count": 1,
+    "quantization": "BF16",
+    "max_inflight": 32
+  }
+]

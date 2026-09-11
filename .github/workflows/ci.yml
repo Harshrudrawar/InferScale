@@ -1,0 +1,53 @@
+name: verify
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22', cache: npm, cache-dependency-path: frontend/package-lock.json}
+      - run: pip install -r requirements.lock && pip install --no-deps -e .
+      - run: ruff check src tests scripts && ruff format --check src tests scripts
+      - run: pytest -q
+      - run: npm ci --prefix frontend && npm run build --prefix frontend
+      - run: python scripts/smoke.py
+      - run: python scripts/worker_smoke.py
+      - run: inferscale benchmark configs/benchmark.json --output results/demo.json
+      - run: inferscale gate results/demo.json --policy configs/policy.demo.json
+      - uses: actions/upload-artifact@v4
+        with: {name: functional-evidence, path: results/demo.json}
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t inferscale:ci .
+      - run: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:0.60.0 image --exit-code 1 --severity HIGH,CRITICAL inferscale:ci
+
+  postgres:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: inferscale
+          POSTGRES_PASSWORD: test_only
+          POSTGRES_DB: inferscale_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: pip install -c requirements.lock -e .
+      - run: python scripts/worker_smoke.py
+        env:
+          INFERSCALE_TEST_POSTGRES_URL: postgresql+psycopg://inferscale:test_only@localhost:5432/inferscale_test

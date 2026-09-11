@@ -1,0 +1,41 @@
+image:
+  repository: inferscale
+  tag: '0.3.0'
+  pullPolicy: IfNotPresent
+api:
+  replicas: 1
+workers:
+  replicas: 2
+  executor: local
+existingSecret: inferscale-secrets
+registry: |
+  [{"id":"synthetic","engine":"synthetic","model_name":"fixture","resource_group":"default"}]
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: '2'
+    memory: 2Gi
+inference:
+  enabled: false
+  image: vllm/vllm-openai:v0.8.5
+  model: Qwen/Qwen2.5-0.5B-Instruct
+  revision: ''
+  replicas: 1
+  tensorParallel: 1
+  maxModelLen: 4096
+  maxNumSeqs: 32
+  quantization: ''
+  nodeSelector: {}
+  tolerations: []
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 4
+    targetQueueDepth: '8'
+ray:
+  enabled: false
+  workers: 2
+  version: '2.58.0'
+  image: inferscale:0.3.0

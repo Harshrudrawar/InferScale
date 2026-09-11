@@ -1,0 +1,29 @@
+{{- if .Values.ray.enabled }}
+apiVersion: ray.io/v1
+kind: RayCluster
+metadata:
+  name: {{ .Release.Name }}-ray
+spec:
+  rayVersion: {{ .Values.ray.version | quote }}
+  headGroupSpec:
+    rayStartParams: {dashboard-host: '0.0.0.0'}
+    template:
+      spec:
+        containers:
+          - name: ray-head
+            image: {{ .Values.ray.image | quote }}
+            ports: [{containerPort: 6379}, {containerPort: 8265}, {containerPort: 10001}]
+            resources: {requests: {cpu: '1', memory: 2Gi}, limits: {cpu: '2', memory: 4Gi}}
+  workerGroupSpecs:
+    - groupName: experiments
+      replicas: {{ .Values.ray.workers }}
+      minReplicas: 1
+      maxReplicas: {{ .Values.ray.workers }}
+      rayStartParams: {}
+      template:
+        spec:
+          containers:
+            - name: ray-worker
+              image: {{ .Values.ray.image | quote }}
+              resources: {requests: {cpu: '1', memory: 2Gi}, limits: {cpu: '2', memory: 4Gi}}
+{{- end }}

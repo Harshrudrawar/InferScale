@@ -1,0 +1,14 @@
+{
+  "transport": "real localhost HTTP with uvicorn",
+  "checks": [
+    "health",
+    "dashboard HTML and bundled assets",
+    "authenticated chat",
+    "async experiment",
+    "polling and persistence",
+    "default gate rejects synthetic",
+    "metrics"
+  ],
+  "passed": true,
+  "experiment_id": "3ef1185c-a654-4862-bb1a-9ec9c6027e23"
+}

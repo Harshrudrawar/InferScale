@@ -1,0 +1,1 @@
+{"live_ray_validation":"blocked","reason":"Ray initialization failed during process introspection: psutil.NoSuchProcess in this managed runtime","remote_task_logic":"covered separately from Ray startup","multi_node_gpu_validation":"not run"}

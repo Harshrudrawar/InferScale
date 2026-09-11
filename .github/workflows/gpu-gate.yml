@@ -1,0 +1,28 @@
+name: hardware-release-gate
+on:
+  workflow_dispatch:
+    inputs:
+      baseline:
+        description: Existing benchmark JSON path on the self-hosted runner
+        required: true
+      config:
+        description: Benchmark config path
+        default: configs/benchmark.gpu.json
+        required: true
+permissions:
+  contents: read
+jobs:
+  benchmark:
+    runs-on: [self-hosted, gpu]
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install -r requirements.lock && pip install --no-deps -e .
+      - name: Benchmark and enforce release policy
+        env:
+          BENCHMARK_CONFIG: ${{ inputs.config }}
+          BASELINE_PATH: ${{ inputs.baseline }}
+          INFERSCALE_SCORER: openeval:weighted
+        run: python scripts/release_gate.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: hardware-evidence, path: results/candidate.json}

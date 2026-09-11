@@ -1,0 +1,14 @@
+{
+  "model": "synthetic",
+  "requests": 32,
+  "concurrency": 4,
+  "warmup": 2,
+  "prompts": ["Explain inference serving.", "Explain continuous batching."],
+  "max_tokens": 32,
+  "seed": 42,
+  "quality_cases": [
+    {"prompt": "ECHO: Paris", "expected": "Paris"},
+    {"prompt": "ECHO: 4", "expected": "4"},
+    {"prompt": "ECHO: inference", "expected": "inference"}
+  ]
+}

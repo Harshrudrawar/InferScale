@@ -1,0 +1,4 @@
+[
+  {"id":"qwen-batch16","engine":"vllm","model_name":"Qwen/Qwen2.5-0.5B-Instruct","port":8001,"max_num_seqs":16,"max_model_len":4096,"dtype":"bfloat16","gpu_devices":[0]},
+  {"id":"qwen-batch32","engine":"vllm","model_name":"Qwen/Qwen2.5-0.5B-Instruct","port":8001,"max_num_seqs":32,"max_model_len":4096,"dtype":"bfloat16","enable_prefix_caching":true,"gpu_devices":[0]}
+]

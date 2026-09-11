@@ -1,0 +1,9 @@
+{
+  "factory": "experiments.neuron.example_model:create",
+  "model_revision": "inferscale-neuron-fixture-v1",
+  "compiler_args": [],
+  "cpu_backend": false,
+  "verify": true,
+  "rtol": 0.01,
+  "atol": 0.01
+}

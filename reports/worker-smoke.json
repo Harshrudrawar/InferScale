@@ -1,0 +1,7 @@
+{
+  "passed": true,
+  "workers": 2,
+  "jobs": 4,
+  "storage": "sqlite",
+  "synthetic": true
+}

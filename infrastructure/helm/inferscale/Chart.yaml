@@ -1,0 +1,6 @@
+apiVersion: v2
+name: inferscale
+description: Inference experiments, durable workers and optional GPU serving
+type: application
+version: 0.3.0
+appVersion: '0.3.0'

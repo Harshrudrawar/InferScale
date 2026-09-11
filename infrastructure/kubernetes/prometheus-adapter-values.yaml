@@ -1,0 +1,9 @@
+rules:
+  custom:
+    - seriesQuery: 'vllm:num_requests_waiting{namespace!="",pod!=""}'
+      resources:
+        overrides:
+          namespace: {resource: namespace}
+          pod: {resource: pod}
+      name: {matches: 'vllm:num_requests_waiting', as: vllm_queue_depth}
+      metricsQuery: 'sum(<<.Series>>{<<.LabelMatchers>>}) by (<<.GroupBy>>)'

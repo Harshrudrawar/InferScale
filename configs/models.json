@@ -1,0 +1,12 @@
+[
+  {
+    "id": "synthetic",
+    "engine": "synthetic",
+    "model_name": "deterministic-fixture",
+    "revision": "fixture-v1",
+    "engine_version": "inferscale-0.1.0",
+    "hardware": "CPU synthetic timer; not GPU inference",
+    "quantization": "not-applicable",
+    "max_inflight": 16
+  }
+]

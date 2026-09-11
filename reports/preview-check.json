@@ -1,0 +1,8 @@
+{
+  "embedded_scripts": 2,
+  "external_scripts": 0,
+  "typescript_build": "passed",
+  "browser_visual_check": "not available",
+  "recorded_experiments": 4,
+  "mode": "read-only snapshot"
+}

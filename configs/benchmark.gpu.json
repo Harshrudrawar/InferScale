@@ -1,0 +1,1 @@
+{"model":"qwen-vllm","requests":1000,"concurrency":8,"repetitions":3,"warmup":10,"prompts":["Explain why batching can change inference throughput.","Summarize the role of a KV cache."],"max_tokens":128,"quality_cases":[{"prompt":"Reply with only the capital of France.","expected":"Paris"},{"prompt":"Reply with only the integer result of 2 + 2.","expected":"4"}]}

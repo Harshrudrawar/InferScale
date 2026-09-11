@@ -1,0 +1,12 @@
+......................................                                   [100%]
+=============================== warnings summary ===============================
+../.venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /workspace/scratch/1581cbc89cdc/.venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_platform.py::test_bayesian_search_uses_unseen_trial
+  /workspace/scratch/1581cbc89cdc/.venv/lib/python3.12/site-packages/sklearn/gaussian_process/kernels.py:445: ConvergenceWarning: The optimal value found for dimension 0 of parameter k2__noise_level is close to the specified lower bound 1e-05. Decreasing the bound and calling fit again may find a better value.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+38 passed, 2 warnings in 6.21s

@@ -1,0 +1,1 @@
+{"deployment":"inferscale-inference","namespace":"inferscale","prometheus_url":"http://localhost:9090","queue_query":"sum(vllm:num_requests_waiting)","utilization_query":"avg(DCGM_FI_DEV_GPU_UTIL)/100","minimum":1,"maximum":4,"cooldown_seconds":120,"interval_seconds":15}

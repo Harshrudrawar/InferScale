@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-workers
+spec:
+  replicas: {{ .Values.workers.replicas }}
+  selector:
+    matchLabels: {app: "{{ .Release.Name }}-worker"}
+  template:
+    metadata:
+      labels: {app: "{{ .Release.Name }}-worker"}
+    spec:
+      automountServiceAccountToken: false
+      securityContext: {runAsNonRoot: true, runAsUser: 10001, fsGroup: 10001}
+      terminationGracePeriodSeconds: 45
+      containers:
+        - name: worker
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          command: [inferscale, worker, --executor, {{ .Values.workers.executor | quote }}]
+          envFrom: [{secretRef: {name: {{ .Values.existingSecret }}}}]
+          {{- if .Values.ray.enabled }}
+          env: [{name: RAY_ADDRESS, value: '{{ .Release.Name }}-ray-head-svc:6379'}]
+          {{- end }}
+          resources: {{ .Values.resources | toJson }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL]}

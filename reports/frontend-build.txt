@@ -1,0 +1,14 @@
+
+> inferscale-dashboard@0.3.0 build
+> tsc -b && vite build
+
+vite v6.4.3 building for production...
+transforming...
+✓ 2197 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.55 kB │ gzip:   0.34 kB
+dist/assets/index-C71OPtEx.css   13.64 kB │ gzip:   3.86 kB
+dist/assets/index-B4mJbMVp.js   244.27 kB │ gzip:  75.41 kB
+dist/assets/charts-lmaPt3qq.js  418.45 kB │ gzip: 114.60 kB
+✓ built in 3.57s
