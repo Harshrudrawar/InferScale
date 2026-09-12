@@ -17,6 +17,10 @@ RUN pip install --no-cache-dir -r requirements.lock && pip install --no-cache-di
 # InferScale executes Python Ray tasks only; do not ship Ray's optional Java runtime.
 # Removing the actual JAR also removes its vulnerable bundled HttpComponents code.
 RUN python -c "import pathlib, ray; jars = pathlib.Path(ray.__file__).parent / 'jars'; [p.unlink() for p in jars.glob('*.jar')]"
+# Dependencies are installed at image build time. Do not ship pip's vulnerable
+# vendored libraries or the bootstrap wheel used to recreate the installer.
+RUN python -m pip uninstall -y pip && apk del py3.12-pip
+RUN python -c "import pathlib, sysconfig; bundled = pathlib.Path(sysconfig.get_path('stdlib')) / 'ensurepip' / '_bundled'; [p.unlink() for p in bundled.glob('pip-*.whl')]"
 COPY configs ./configs
 COPY --from=dashboard /frontend/dist ./frontend/dist
 RUN mkdir /data && chown runner:runner /data

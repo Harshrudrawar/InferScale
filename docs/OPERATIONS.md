@@ -54,3 +54,5 @@ The runtime uses the glibc-based Wolfi image with Python 3.12 and its OS package
 CI retains the complete JSON scan report even when scanning fails. An unfixed distribution vulnerability remains a failing finding; this project does not automatically suppress it. A passing functional test job is not a security qualification.
 
 The Wolfi image is tested with the live HTTP/SQLite smoke and Python Ray execution before security qualification. The base tag and package index are refreshed on each CI build to pick up fixes; record the resulting image digest when deploying. Debian-based host setup instructions still apply to external engine hosts, not the container package manager.
+
+The runtime image installs dependencies during the build and removes pip and its bootstrap wheel afterward, including the vulnerable copies of msgpack and setuptools bundled inside pip. To add dependencies, rebuild the image; installing packages inside a running container (including Ray pip runtime environments) is not supported. Application dependencies and their scan metadata remain installed.
