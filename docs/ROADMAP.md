@@ -6,14 +6,14 @@
 | Benchmarking | Closed/open loop, repeated trials, timing, overload accounting | Automated tests and synthetic runs |
 | Quality | Real OpenEval plugin integration and gates | Accuracy/contains/weighted executed; Ollama judge not run |
 | Search | Grid/random/GP expected improvement, durable studies, recommendations | Search logic and complete local study tested |
-| Distributed execution | SQL worker coordination and Ray adapter | Multi-worker ownership tested; Ray startup blocked by runtime process introspection |
+| Distributed execution | SQL worker coordination and Ray adapter | Multi-worker ownership and real PostgreSQL integration passed; Python Ray task passed in the runtime image in hosted CI |
 | Engine tuning | Process lifecycle, actual command generation, tuning loop | Engine flag generation tested; hardware process launch not run |
 | GPU/engine observability | nvidia-smi, system metrics, Prometheus phase deltas | Parser/system collector tested; no GPU samples |
 | Routing/reliability | Health, breakers, explicit failover, fault injection, cancellation | Local fault/ownership tests; no physical network partition test |
 | Kubernetes/Helm | API/workers/GPU/Ray/HPA chart and adapter configuration | Helm lint and full rendering passed; no cluster install |
 | Autoscaling | HPA and separate queue/utilization controller | Decision logic tested; no live scale action |
-| Dashboard | Five functional views backed by API | TypeScript/build and HTTP asset/API checks; no browser visual QA |
-| CI/security | Test/build/scan workflows, roles, audit, tracing, additive migration | Auth/migration tests and separate worker-process smoke; hosted CI scan and OTLP export not executed |
+| Dashboard | Five functional views backed by API | TypeScript/build, real Chromium authentication/submission/navigation, mobile overflow and JS-error checks passed; screenshots retained for visual review |
+| CI/security | Test/build/scan workflows, roles, audit, tracing, additive migration | Auth/migration, worker-process smoke and hosted container security scan passed; OTLP export remains unvalidated |
 | CUDA/NCCL | Executable fusion and collective experiments | Source only; no CUDA compiler/GPU run |
 | Inferentia/Neuron | NeuronX compilation CLI, saved artifacts and verification; generic compatible serving endpoint | Compiler orchestration tested with SDK doubles; no accelerator compilation/execution |
 

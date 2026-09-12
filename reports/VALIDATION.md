@@ -26,3 +26,11 @@ Real vLLM/SGLang inference with model weights; GPU process tuning; CUDA/NCCL pro
 The NeuronX fixed-shape compilation workflow is implemented. Configuration validation, compiler arguments, artifact manifests and output verification failure handling are tested using SDK doubles; no actual Neuron compilation was performed. See `docs/ROADMAP.md` for the scope matrix.
 
 The smoke script starts and stops its own server. This archive does not deploy a hosted application.
+
+## Hosted CI update — 2026-09-12
+
+Run [34662881191](https://github.com/Harshrudrawar/InferScale/actions/runs/34662881191) passed all three jobs: tests/frontend, real PostgreSQL workers, and container qualification. The actual runtime image passed HTTP/SQLite and Python Ray execution. Trivy completed successfully with zero HIGH/CRITICAL vulnerability findings and no blocking secret findings. This supersedes the earlier local-only limitations for those checks; it does not validate GPU hardware or a production deployment.
+
+A separate local live HTTP check completed 288 authenticated requests across concurrency 1, 8, and 32 with correct content and zero failures, then verified readiness and metrics. Synthetic backend only; not production capacity evidence. Browser validation is now included in CI and retains screenshots. See `docs/RELEASE_CHECKLIST.md` for the exact checks and external prerequisites.
+
+The Chromium test job in run [34663480725](https://github.com/Harshrudrawar/InferScale/actions/runs/34663480725) passed authenticated connection, submission and completion of an experiment, navigation through all five views, Escape dismissal, 390px mobile overflow checks, no uncaught JavaScript errors, and empty local/session storage. This is automated browser interaction evidence; a full manual visual/accessibility audit remains separate.

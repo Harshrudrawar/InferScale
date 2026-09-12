@@ -1,0 +1,50 @@
+name: hardware qualification
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Prepared self-hosted hardware runner
+        required: true
+        type: choice
+        options: [cuda-nccl, neuron]
+defaults:
+  run:
+    shell: bash
+permissions:
+  contents: read
+jobs:
+  cuda:
+    if: inputs.target == 'cuda-nccl'
+    runs-on: [self-hosted, linux, inferscale-gpu]
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - run: mkdir -p results/hardware
+      - name: Record GPU environment
+        run: |
+          nvidia-smi > results/hardware/nvidia-smi.txt
+          nvcc --version > results/hardware/nvcc.txt
+          python -c "import torch; assert torch.cuda.device_count() >= 2; print(torch.__version__, torch.version.cuda)" > results/hardware/torch.txt
+      - name: Compile and verify CUDA kernel
+        run: |
+          nvcc -O3 experiments/cuda/fused_affine_relu.cu -o /tmp/inferscale-fused
+          /tmp/inferscale-fused | tee results/hardware/cuda.txt
+      - name: Verify NCCL collective on two GPUs
+        run: torchrun --nproc-per-node=2 experiments/nccl_collective.py | tee results/hardware/nccl.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: cuda-nccl-evidence, path: results/hardware/}
+  neuron:
+    if: inputs.target == 'neuron'
+    runs-on: [self-hosted, linux, inferscale-neuron]
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile and verify on Neuron hardware
+        run: |
+          test -e /dev/neuron0
+          python -m pip install --no-deps -e .
+          python -m inferscale.cli neuron-compile configs/neuron.example.json --output results/neuron-${{ github.run_id }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: neuron-evidence, path: 'results/neuron-*/'}
