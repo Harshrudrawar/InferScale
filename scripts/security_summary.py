@@ -25,6 +25,13 @@ def summarize(path):
         print(
             f"{v['PkgName']} {v['VulnerabilityID']} {v['Severity']} installed={v['InstalledVersion']} fixed={v.get('FixedVersion') or 'not available'}"
         )
+    for result in results:
+        for secret in result.get("Secrets", []):
+            print(
+                f"Secret finding: target={result.get('Target')} "
+                f"rule={secret.get('RuleID')} severity={secret.get('Severity')} "
+                f"line={secret.get('StartLine')}"
+            )
     return findings
 
 
